@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="styles/pretty_efx.css">
+    <style>
+        @font-face {
+            font-family: 'source_sans';
+            src: url('Fonts/sourcesanspro-regular-webfont.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'source_sans';
+            src: url('Fonts/sourcesanspro-bold-webfont.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+        body {
+            font-family: 'source_sans';
+            -moz-user-select: none;
+            user-select: none;
+            background-color: #EEE;
+        }
+        label.switch {
+            float:left;
+        }
+        button {
+            font-family: 'source_sans';
+        }
+    </style>
+</head>
+<body>
+    <input type="checkbox" class="switch" id="autocloseEnabled" name="autocloseEnabled"/><label class="switch" for="autocloseEnabled">Toggle</label>
+    <span style="font-family: 'source_sans'; font-size: 15pt; font-weight: bold; float:right">AutoClose</span><br><br>
+    <button type="button" class="btn" id="addCWeb" style="width:180px; margin: 10px 3px;">Add current site to blacklist</button>
+    <button type="button" class="btn" id="openOptions" style="width:180px; margin: 3px;">Open options menu</button>
+</body>
+<script src="bAction.js" charset="utf-8"></script>
+
+</html>
