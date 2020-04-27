@@ -6,6 +6,7 @@ var editBtn = document.getElementById("editItemBtn");
 var searchTypeLst = document.getElementById("searchTypeSel");
 var delayEnabledChk = document.getElementById("timerEnabled");
 var delayMilli = document.getElementById("delayMilli");
+var closeDelayEnabled = document.getElementById("closeDelayEnabled");
 
 delayMilli.addEventListener('input', SomethingChanged);
 submitBtn.addEventListener('click', AddNewToBlacklist);
@@ -148,14 +149,17 @@ function ToggleDelayEnable() {
         closeDelayTime: parseInt(delayMilli.value)
     });
     delayMilli.disabled = !delayEnabledChk.checked;
+    closeDelayEnabled.innerText = delayEnabledChk.checked ? "Enabled" : "Disabled";
 }
 
 function UpdateList()
 {
-    var delayEnableItem = browser.storage.local.get('closeDelayEnabled');
+    var delayEnableItem = browser.storage.local.get(['closeDelayEnabled', 'closeDelayTime']);
     delayEnableItem.then((res) => {
         delayEnabledChk.checked = res.closeDelayEnabled;
         delayMilli.disabled = !delayEnabledChk.checked;
+        closeDelayEnabled.innerText = delayEnabledChk.checked ? "Enabled" : "Disabled";
+        delayMilli.value = res.closeDelayTime;
     });
     for (var i = displayList.options.length - 1; i >= 0; i--)
     {
