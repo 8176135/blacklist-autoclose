@@ -4,17 +4,14 @@ RegExp.escape = function(s)
 };
 
 // Setup enabled at the start
-var gettingEnabled = browser.storage.local.get('autoCloseEnabled');
-gettingEnabled.then((isEnabled) =>
-	{
-		if (isEnabled === undefined) {
-			browser.storage.local.set(
-			        {
-			            autoCloseEnabled: true
-			        });
-		}
+browser.storage.local.get('autoCloseEnabled').then((item) => {
+	if( !item.autoCloseEnabled && item.autoCloseEnabled !== false ) {
+		browser.storage.local.set(
+        {
+            autoCloseEnabled: true
+        });
 	}
-);
+});
 
 function newNavigation(details) {
 
