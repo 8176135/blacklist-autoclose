@@ -48,7 +48,9 @@ function AddNewToBlacklist()
             url: newSiteVal.value,
             regexSearch: regSearch
         });
+
         let regString;
+
         if (temp[temp.length - 1].regexSearch)
         {
             regString = (new RegExp(temp[temp.length - 1].url, "i"))
@@ -56,8 +58,9 @@ function AddNewToBlacklist()
         else
         {
             regString = RegExp.escape(temp[temp.length - 1].url).replace(/\\\*/g, ".*");
-            regString = "^".concat(regString).concat("$");
+            regString = new RegExp("^".concat(regString).concat("$"), "i");
         }
+
         if (regString.test("about:addons") || regString.test("about:newtab") || regString.test("about:blank"))
         {
             alert("This expression would block about:addons, about:newtab, or about:blank, can't allow that! (since you can't go back in and remove it if you did.)");
