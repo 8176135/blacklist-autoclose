@@ -1,9 +1,11 @@
 var openOptionsBtn = document.getElementById("openOptions");
 var addCurrentPageBtn = document.getElementById("addCWeb");
+var addCurrentDomainBtn = document.getElementById("addCWebDomain");
 var toggleBtn = document.getElementById("autocloseEnabled");
 toggleBtn.addEventListener('click', Toggle);
 openOptionsBtn.addEventListener('click', OpenOptionsMenu);
-addCurrentPageBtn.addEventListener('click', AddCurrentToBlacklist);
+addCurrentPageBtn.addEventListener('click', AddCurrentPageToBlacklist);
+addCurrentDomainBtn.addEventListener('click', AddCurrentDomainToBlacklist);
 UpdateButton();
 
 function OpenOptionsMenu()
@@ -51,7 +53,7 @@ function Toggle()
     });
 }
 
-function AddCurrentToBlacklist()
+function AddCurrentToBlacklist(isDomain)
 {
     var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
     gettingItem.then((res) =>
@@ -74,15 +76,32 @@ function AddCurrentToBlacklist()
         {
             for (tab of tabs)
             {
-                if (tab.url.startsWith("about:addons"))
+                if (tab.url.startsWith("about:"))
                 {
-                    alert("Sorry, can't let you add the about:addons page (since you can't go back in and remove it if you did.)");
+                    alert("Sorry, can't let you add an \"about:\" page (since you might not be able to go back in and remove it if you did.)");
                     return;
                 }
+                let target = "";
+                let regexSearch;
+                if (isDomain) {
+                    var matches = tab.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+                    var domain = matches && matches[1];  // domain will be null if no match is found
+                    console.log(domain);
+                    if (domain == null) {
+                        alert("Only support http/https urls for automatic domain blacklist, please add your domain manually.");
+                        return;
+                    }
+                    target = `^https?\:\/\/${domain}\/`;
+                    regexSearch = true;
+                } else {
+                    target = tab.url;
+                    regexSearch = false;
+                }
+
                 temp.push(
                 {
-                    url: tab.url,
-                    regexSearch: false
+                    url: target,
+                    regexSearch: regexSearch
                 });
                 var outVal = JSON.stringify(temp);
                 var settingItem = browser.storage.local.set(
@@ -94,3 +113,12 @@ function AddCurrentToBlacklist()
 
     });
 }
+
+function AddCurrentPageToBlacklist() {
+    AddCurrentToBlacklist(false);
+}
+
+function AddCurrentDomainToBlacklist() {
+    AddCurrentToBlacklist(true);
+}
+

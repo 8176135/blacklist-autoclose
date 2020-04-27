@@ -22,10 +22,10 @@ RegExp.escape = function(s)
 
 function AddNewToBlacklist()
 {
-    var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+    let gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
     gettingItem.then((res) =>
     {
-        var temp;
+        let temp;
         if (!res.blacklistSitesAutoClose)
         {
             temp = [];
@@ -34,7 +34,7 @@ function AddNewToBlacklist()
         {
             temp = JSON.parse(res.blacklistSitesAutoClose);
         }
-        var regSearch;
+        let regSearch;
         if (searchTypeLst.value == 0)
         {
             regSearch = false;
@@ -48,23 +48,20 @@ function AddNewToBlacklist()
             url: newSiteVal.value,
             regexSearch: regSearch
         });
+        let regString;
         if (temp[temp.length - 1].regexSearch)
         {
-            if ((new RegExp(temp[temp.length - 1].url, "i")).test("about:addons"))
-            {
-                alert("This expression would block about:addons, can't allow that! (since you can't go back in and remove it if you did.)");
-                return;
-            }
+            regString = (new RegExp(temp[temp.length - 1].url, "i"))
         }
         else
         {
-            var regString = RegExp.escape(temp[temp.length - 1].url).replace(/\\\*/g, ".*");
+            regString = RegExp.escape(temp[temp.length - 1].url).replace(/\\\*/g, ".*");
             regString = "^".concat(regString).concat("$");
-            if ((new RegExp(regString, "i")).test("about:addons"))
-            {
-                alert("This expression would block about:addons, can't allow that! (since you can't go back in and remove it if you did.)");
-                return;
-            }
+        }
+        if (regString.test("about:addons") || regString.test("about:newtab") || regString.test("about:blank"))
+        {
+            alert("This expression would block about:addons, about:newtab, or about:blank, can't allow that! (since you can't go back in and remove it if you did.)");
+            return;
         }
 
         newSiteVal.value = "";

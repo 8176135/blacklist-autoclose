@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Blacklist AutoClose",
-    "version": "1.1",
+    "version": "1.2",
 
     "description": "Automatically close all blacklisted webpages specified by the user. Useful for dealing with popups that redirects you to another page.",
 
@@ -21,7 +21,7 @@
         "browser_style": true,
         "open_in_tab": false
     },
-    "permissions": ["tabs", "storage"],
+    "permissions": ["tabs", "storage", "webNavigation"],
     "background": {
         "scripts": ["AutoClose.js"]
     }

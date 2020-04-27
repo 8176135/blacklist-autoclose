@@ -3,8 +3,21 @@ RegExp.escape = function(s)
 	return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
 
-function handleUpdated(tabId, changeInfo, tabInfo)
-{
+// Setup enabled at the start
+var gettingEnabled = browser.storage.local.get('autoCloseEnabled');
+gettingEnabled.then((isEnabled) =>
+	{
+		if (isEnabled === undefined) {
+			browser.storage.local.set(
+			        {
+			            autoCloseEnabled: true
+			        });
+		}
+	}
+);
+
+function newNavigation(details) {
+
 	var gettingEnabled = browser.storage.local.get('autoCloseEnabled');
 	gettingEnabled.then((isEnabled) =>
 	{
@@ -14,33 +27,36 @@ function handleUpdated(tabId, changeInfo, tabInfo)
 		var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
 		gettingItem.then((res) =>
 		{
+			console.log(details);
 			if (!res.blacklistSitesAutoClose)
 			{
 				return;
 			}
+
 			var parsed = JSON.parse(res.blacklistSitesAutoClose);
 			for (var i = 0; i < parsed.length; i++)
 			{
 				if (parsed[i].regexSearch)
 				{
-					if ((new RegExp(parsed[i].url, "i")).test(changeInfo.url))
+					if ((new RegExp(parsed[i].url, "i")).test(details.url))
 					{
-						CloseTab(tabId);
+						CloseTab(details.tabId);
 					}
 				}
 				else
 				{
 					var regString = RegExp.escape(parsed[i].url).replace(/\\\*/g, ".*");
 					regString = "^".concat(regString).concat("$");
-					if ((new RegExp(regString, "i")).test(changeInfo.url))
+					if ((new RegExp(regString, "i")).test(details.url))
 					{
-						CloseTab(tabId);
+						CloseTab(details.tabId);
 					}
 				}
 			}
 		});
 	});
 }
+
 
 function CloseTab(tabId) {
 	var delayEnabledItem = browser.storage.local.get(["closeDelayEnabled","closeDelayTime"]);
@@ -54,4 +70,5 @@ function CloseTab(tabId) {
 		}
 	});
 }
-browser.tabs.onUpdated.addListener(handleUpdated);
+
+browser.webNavigation.onBeforeNavigate.addListener(newNavigation)
