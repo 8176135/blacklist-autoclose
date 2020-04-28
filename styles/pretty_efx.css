@@ -29,7 +29,7 @@ label.switch:after {
 }
 
 input.switch:checked + label.switch {
-  background: #bada55;
+  background: #719756;
 }
 
 input.switch:checked + label.switch:after {
@@ -55,14 +55,14 @@ label.switch:active:after {
   border-radius: 2px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
   
-  background-color: #7C0000;
+  background-color: #975656;
   color: #ecf0f1;
   
   transition: background-color .15s;
 }
 
 .btn:hover {
-  background-color: #3E0000;
+  background-color: #719756;
 }
 
 .btn > * {
