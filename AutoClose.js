@@ -24,9 +24,11 @@ function newNavigation(details) {
 		var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
 		gettingItem.then((res) =>
 		{
-			console.log(details);
 			if (!res.blacklistSitesAutoClose)
 			{
+				return;
+			}
+			if (details.url == "moz-extension://7d31354f-becc-4991-9c37-6218b5097adf/options.html") { // Hey its our options page
 				return;
 			}
 
