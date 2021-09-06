@@ -39,7 +39,7 @@ function newNavigation(details) {
 				{
 					if ((new RegExp(parsed[i].url, "i")).test(details.url))
 					{
-						CloseTab(details.tabId);
+						CloseTab(details.tabId, details.url, parsed[i].url);
 					}
 				}
 				else
@@ -48,7 +48,7 @@ function newNavigation(details) {
 					regString = "^".concat(regString).concat("$");
 					if ((new RegExp(regString, "i")).test(details.url))
 					{
-						CloseTab(details.tabId);
+						CloseTab(details.tabId, details.url, parsed[i].url);
 					}
 				}
 			}
@@ -57,9 +57,20 @@ function newNavigation(details) {
 }
 
 
-function CloseTab(tabId) {
-	var delayEnabledItem = browser.storage.local.get(["closeDelayEnabled","closeDelayTime"]);
+function CloseTab(tabId, url, regex) {
+	
+	var delayEnabledItem = browser.storage.local.get(["closeDelayEnabled","closeDelayTime", "closeHistory"]);
 	delayEnabledItem.then((res) => {
+
+		if (!res.closeHistory) {
+			res.closeHistory = { historyLength: 25, historyStore: [] }
+		}
+		res.closeHistory.historyStore.push({url: url, regex: regex});
+		while (res.closeHistory.historyStore.length > res.closeHistory.historyLength) {
+			res.closeHistory.historyStore.shift();
+		}
+		browser.storage.local.set({closeHistory: res.closeHistory});
+
 		if (res.closeDelayEnabled && res.closeDelayTime != null) {
 			console.log(tabId);
 			console.log(res.closeDelayTime);

@@ -24,14 +24,31 @@
     flex-direction: column;
     -moz-user-select: none;
     user-select: none;
+    margin: 10px 5px;
   }
+
+  input {
+      border: black solid 1px;
+      padding: 5px !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body, input   { background:  #202023; color: white; }
+    input {
+      border: white solid 1px !important;
+    }
+  }
+
   button {
     font-weight: bold;
     /*font-family: 'source_sans'*/
   }
   select, input, button, option {
     font-family: 'source_sans';
-    outline: 0;
+    /* outline: 0; */
+  }
+  label {
+    margin-right: 5px;
   }
   .wrapper {
   /*    display: flex;
@@ -42,7 +59,15 @@
   grid-template-columns: 5fr minmax(80px, 1fr) minmax(130px, 1.5fr);
   grid-row-gap: 10px;
   grid-column-gap: 10px;
-  grid-template-rows: : 1fr 20px;
+  grid-template-rows: 40px 1fr 40px;
+}
+
+.lastUsedRegex {
+  background-color: lightblue;
+}
+
+#history_list {
+  height: 300px;
 }
 
 .fill {
@@ -57,26 +82,31 @@
 <body>
   <h2 style="flex: 0 1 auto">Blacklisted Sites</h2>
   <div class="wrapper" style="">
-    <select style="grid-column: 1/3; grid-row: 1 / 2;" name="sometext" size="6" id="blSiteList">
+    <div style="grid-column: 1/3; grid-row: 1;">
+      <label for="filter"><b>Filter: </b></label> 
+      <input type="text" name="filter" id="filter">
+    </div>
+    
+    <select style="grid-column: 1/3; grid-row: 2 / 3;" name="sometext" size="6" id="blSiteList">
       <option>text1</option>
       <option>text2</option>
       <option>text3</option>
       <option>text4</option>
       <option>text5</option>
     </select>
-    <div class="controlDiv" style="grid-column: 3 / 4; grid-row: 1/2;">
+    <div class="controlDiv" style="grid-column: 3 / 4; grid-row: 2/3;">
       <button type="button" id="editItemBtn" class="fill btn">Edit Selected</button><br>
       <button type="button" id="removeItemBtn" class="fill btn">Remove Selected</button>
     </div>
 
 
     <!-- <div style="margin: 5px 0; flex: 0 0 auto; display: flex; justify-content: space-between; "> -->
-      <input type="text" name="siteToAdd" id="newSiteVal" value="" style="grid-column: 1/2; grid-row: 2/3;">
-      <select class="searchTypeSel" id="searchTypeSel" name="" size="1" style="grid-column: 2/3; grid-row: 2/3;">
+      <input type="text" name="siteToAdd" id="newSiteVal" value="" style="grid-column: 1/2; grid-row: 3/4;">
+      <select class="searchTypeSel" id="searchTypeSel" name="" size="1" style="grid-column: 2/3; grid-row: 3/4;">
         <option value="0">Standard (exact match with * as wildcard)</option>
         <option value="1">Regex</option>
       </select>
-      <button type="button" id="submitBtn" class="btn" style="grid-column: 3 / 4; grid-row: 2 / 3;">Submit</button>
+      <button type="button" id="submitBtn" class="btn" style="grid-column: 3 / 4; grid-row: 3 / 4;">Submit</button>
       <!-- </div> -->
     </div>
 
@@ -93,6 +123,11 @@
       <input type="number" id="delayMilli" name="delayMilli" placeholder="Delay in milliseconds" min="0" max="1000000"><label style="margin-left: 3px; margin-right: 20px; margin-top: 1px; vertical-align: center;" for="delayMilli">ms</label>
       <input type="checkbox" class="switch" id="timerEnabled" name="timerEnabled" id="timerEnabled"/><label class="switch" for="timerEnabled">Toggle</label>
     </div>
+
+    <h3>Recently closed sites (Most recent first)</h3>
+    <textarea readonly id="history_list">
+    </textarea>
+    <button id="clear_history">Clear History</button>
   </body>
   <script src="options.js" charset="utf-8"></script>
   </html>

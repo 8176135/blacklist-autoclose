@@ -5,6 +5,7 @@ var removeBtn = document.getElementById("removeItemBtn");
 var editBtn = document.getElementById("editItemBtn");
 var searchTypeLst = document.getElementById("searchTypeSel");
 var delayEnabledChk = document.getElementById("timerEnabled");
+var clearHistroyBtn = document.getElementById("clear_history");
 var delayMilli = document.getElementById("delayMilli");
 var closeDelayEnabled = document.getElementById("closeDelayEnabled");
 
@@ -13,6 +14,7 @@ submitBtn.addEventListener('click', AddNewToBlacklist);
 removeBtn.addEventListener('click', RemoveSelectedItem);
 editBtn.addEventListener('click', EditSelItem);
 delayEnabledChk.addEventListener('click', ToggleDelayEnable);
+clearHistroyBtn.addEventListener('click', ClearHistory);
 
 UpdateList();
 
@@ -20,6 +22,19 @@ RegExp.escape = function(s)
 {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
+
+function ClearHistory()
+{
+    browser.storage.local.get('closeHistory').then((res) =>
+    {
+        res.closeHistory.historyStore = [];
+        browser.storage.local.set({
+            closeHistory: res.closeHistory,
+        });
+
+        document.querySelector('#history_list').value = "";
+    });
+}
 
 function AddNewToBlacklist()
 {
@@ -165,16 +180,23 @@ function UpdateList()
     {
         displayList.remove(i);
     }
-    var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+    var gettingItem = browser.storage.local.get(['blacklistSitesAutoClose', 'closeHistory']);
     gettingItem.then((res) =>
     {
+        let reversed = res.closeHistory.historyStore.reverse();
+        document.querySelector('#history_list').value = 
+            reversed.map(c => c.url + ' --- Rule: ' + c.regex).join('\n\n');
+
         var parsed = JSON.parse(res.blacklistSitesAutoClose);
         for (var i = 0; i < parsed.length; i++)
         {
             var option = document.createElement("option");
             option.text = parsed[i].url + " --- Regex: " + parsed[i].regexSearch;
             option.value = i;
-            option.className = "entry"
+            option.className = "entry";
+            if (reversed.length > 0 && parsed[i].url == reversed[0].regex) {
+                option.className += " lastUsedRegex";
+            }
             displayList.add(option);
         }
     });
