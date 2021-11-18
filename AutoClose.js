@@ -4,9 +4,9 @@ RegExp.escape = function(s)
 };
 
 // Setup enabled at the start
-browser.storage.local.get('autoCloseEnabled').then((item) => {
+browser.storage.sync.get('autoCloseEnabled').then((item) => {
 	if( !item.autoCloseEnabled && item.autoCloseEnabled !== false ) {
-		browser.storage.local.set(
+		browser.storage.sync.set(
         {
             autoCloseEnabled: true
         });
@@ -15,13 +15,13 @@ browser.storage.local.get('autoCloseEnabled').then((item) => {
 
 function newNavigation(details) {
 
-	var gettingEnabled = browser.storage.local.get('autoCloseEnabled');
+	var gettingEnabled = browser.storage.sync.get('autoCloseEnabled');
 	gettingEnabled.then((isEnabled) =>
 	{
 		if (!isEnabled.autoCloseEnabled) {
 			return;
 		}
-		var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+		var gettingItem = browser.storage.sync.get('blacklistSitesAutoClose');
 		gettingItem.then((res) =>
 		{
 			if (!res.blacklistSitesAutoClose)
@@ -59,7 +59,7 @@ function newNavigation(details) {
 
 function CloseTab(tabId, url, regex) {
 	
-	var delayEnabledItem = browser.storage.local.get(["closeDelayEnabled","closeDelayTime", "closeHistory"]);
+	var delayEnabledItem = browser.storage.sync.get(["closeDelayEnabled","closeDelayTime", "closeHistory"]);
 	delayEnabledItem.then((res) => {
 
 		if (!res.closeHistory) {
@@ -69,7 +69,7 @@ function CloseTab(tabId, url, regex) {
 		while (res.closeHistory.historyStore.length > res.closeHistory.historyLength) {
 			res.closeHistory.historyStore.shift();
 		}
-		browser.storage.local.set({closeHistory: res.closeHistory});
+		browser.storage.sync.set({closeHistory: res.closeHistory});
 
 		if (res.closeDelayEnabled && res.closeDelayTime != null) {
 			console.log(tabId);

@@ -15,7 +15,7 @@ function OpenOptionsMenu()
 
 function UpdateButton()
 {
-    var gettingItem = browser.storage.local.get('autoCloseEnabled');
+    var gettingItem = browser.storage.sync.get('autoCloseEnabled');
     gettingItem.then((res) =>
     {
         if (res.autoCloseEnabled == null || res.autoCloseEnabled)
@@ -39,10 +39,10 @@ function UpdateButton()
 
 function Toggle()
 {
-    var gettingItem = browser.storage.local.get('autoCloseEnabled');
+    var gettingItem = browser.storage.sync.get('autoCloseEnabled');
     gettingItem.then((res) =>
     {
-        var settingVar = browser.storage.local.set(
+        var settingVar = browser.storage.sync.set(
         {
             autoCloseEnabled: toggleBtn.checked
         });
@@ -55,7 +55,7 @@ function Toggle()
 
 function AddCurrentToBlacklist(isDomain)
 {
-    var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+    var gettingItem = browser.storage.sync.get('blacklistSitesAutoClose');
     gettingItem.then((res) =>
     {
         var temp;
@@ -104,7 +104,7 @@ function AddCurrentToBlacklist(isDomain)
                     regexSearch: regexSearch
                 });
                 var outVal = JSON.stringify(temp);
-                var settingItem = browser.storage.local.set(
+                var settingItem = browser.storage.sync.set(
                 {
                     blacklistSitesAutoClose: outVal
                 });

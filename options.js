@@ -25,10 +25,10 @@ RegExp.escape = function(s)
 
 function ClearHistory()
 {
-    browser.storage.local.get('closeHistory').then((res) =>
+    browser.storage.sync.get('closeHistory').then((res) =>
     {
         res.closeHistory.historyStore = [];
-        browser.storage.local.set({
+        browser.storage.sync.set({
             closeHistory: res.closeHistory,
         });
 
@@ -38,7 +38,7 @@ function ClearHistory()
 
 function AddNewToBlacklist()
 {
-    let gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+    let gettingItem = browser.storage.sync.get('blacklistSitesAutoClose');
     gettingItem.then((res) =>
     {
         let temp;
@@ -85,7 +85,7 @@ function AddNewToBlacklist()
 
         newSiteVal.value = "";
         var outVal = JSON.stringify(temp);
-        var settingItem = browser.storage.local.set(
+        var settingItem = browser.storage.sync.set(
         {
             blacklistSitesAutoClose: outVal
         });
@@ -98,7 +98,7 @@ function AddNewToBlacklist()
 
 function EditSelItem()
 {
-    var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+    var gettingItem = browser.storage.sync.get('blacklistSitesAutoClose');
     gettingItem.then((res) =>
     {
         var parsed = JSON.parse(res.blacklistSitesAutoClose);
@@ -116,7 +116,7 @@ function EditSelItem()
             }
 
             var outVal = JSON.stringify(parsed);
-            var settingItem = browser.storage.local.set(
+            var settingItem = browser.storage.sync.set(
             {
                 blacklistSitesAutoClose: outVal
             });
@@ -130,7 +130,7 @@ function EditSelItem()
 
 function RemoveSelectedItem()
 {
-    var gettingItem = browser.storage.local.get('blacklistSitesAutoClose');
+    var gettingItem = browser.storage.sync.get('blacklistSitesAutoClose');
     gettingItem.then((res) =>
     {
         var parsed = JSON.parse(res.blacklistSitesAutoClose);
@@ -138,7 +138,7 @@ function RemoveSelectedItem()
         {
             parsed.splice(displayList.value, 1);
             var outVal = JSON.stringify(parsed);
-            var settingItem = browser.storage.local.set(
+            var settingItem = browser.storage.sync.set(
             {
                 blacklistSitesAutoClose: outVal
             });
@@ -151,14 +151,14 @@ function RemoveSelectedItem()
 }
 
 function SomethingChanged(e) {
-    browser.storage.local.set(
+    browser.storage.sync.set(
     {
         closeDelayTime: parseInt(e.target.value)
     });
 }
 
 function ToggleDelayEnable() {
-    let temp = browser.storage.local.set(
+    let temp = browser.storage.sync.set(
     {
         closeDelayEnabled: delayEnabledChk.checked,
         closeDelayTime: parseInt(delayMilli.value)
@@ -169,7 +169,7 @@ function ToggleDelayEnable() {
 
 function UpdateList()
 {
-    var delayEnableItem = browser.storage.local.get(['closeDelayEnabled', 'closeDelayTime']);
+    var delayEnableItem = browser.storage.sync.get(['closeDelayEnabled', 'closeDelayTime']);
     delayEnableItem.then((res) => {
         delayEnabledChk.checked = res.closeDelayEnabled;
         delayMilli.disabled = !delayEnabledChk.checked;
@@ -180,7 +180,7 @@ function UpdateList()
     {
         displayList.remove(i);
     }
-    var gettingItem = browser.storage.local.get(['blacklistSitesAutoClose', 'closeHistory']);
+    var gettingItem = browser.storage.sync.get(['blacklistSitesAutoClose', 'closeHistory']);
     gettingItem.then((res) =>
     {
         let reversed = res.closeHistory.historyStore.reverse();
