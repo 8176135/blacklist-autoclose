@@ -215,7 +215,7 @@
             </li>
         </ul>
     </div>
-    <div style="margin: 5px; font-size: 16pt; font-weight: bolder">
+    <div style="margin: 5px 0; font-size: 16pt; font-weight: bolder">
         <span>Close Delay: </span><span id="closeDelayEnabled" />
     </div>
     <div class="closeDelayWrapper">
@@ -271,16 +271,7 @@
 
     button {
         font-weight: bold;
-        /*font-family: 'source_sans'*/
     }
-
-    /* select, */
-    /* input, */
-    /* button, */
-    /* option { */
-    /* font-family: "source_sans"; */
-    /* outline: 0; */
-    /* } */
 
     label {
         margin-right: 5px;
