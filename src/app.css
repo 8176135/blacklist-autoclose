@@ -46,7 +46,7 @@ label.switch:active:after {
   height: 35px;
   display: block;
   /*margin: 30px auto;*/
-  padding: 0;
+  padding: 0 15px;
   text-align: center;
   overflow: hidden;
 
@@ -61,7 +61,12 @@ label.switch:active:after {
   transition: background-color .15s;
 }
 
-.btn:hover {
+.btn:disabled {
+  background-color: #777676;
+  color: #BBBBBB;
+}
+
+.btn:hover:not(:disabled) {
   background-color: #719756;
 }
 
@@ -96,22 +101,46 @@ label.switch:active:after {
   transform: translate(-50%, -50%);
 }
 
-.btn:active:before {
+.btn:not(:disabled):active:before {
   width: 120%;
   padding-top: 120%;
-  
+  overflow: hidden;
   transition: width .2s ease-out, padding-top .2s ease-out;
 }
 
-select {
-  /*overflow: hidden;*/
-  /*height: 100%;*/
-}
 input[type="text"] {
-    padding: 0px 10px;
+  padding: 0px 10px;
 }
 option.entry {
   padding: 5px 10px;
   vertical-align: middle;
   overflow: hidden;
+}
+
+:root {
+  font-family: 'source_sans', sans-serif;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :root,
+  input {
+      background: #202023;
+      color: #111;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  input,
+  select,
+  textarea {
+      background: #202023;
+      color: #EEE;
+  }
+
+  input {
+      border: #EEE solid 1px !important;
+  }
 }
