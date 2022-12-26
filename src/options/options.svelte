@@ -247,7 +247,7 @@
     </div>
 
     <h3>Recently closed sites (Most recent first)</h3>
-    <textarea readonly style="width: 100%;" value={closeHistory} />
+    <textarea class="history-list" readonly style="width: 100%;" value={closeHistory} />
     <button class="btn" on:click={ClearHistory}>Clear History</button>
 </div>
 
@@ -293,7 +293,7 @@
         background-color: lightblue;
     }
 
-    #history_list {
+    #history-list {
         height: 300px;
     }
 
