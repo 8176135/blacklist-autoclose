@@ -7,6 +7,12 @@
         type BlacklistSitesACEntry,
     } from "~/lib/models";
 
+    enum AddBlacklistType {
+        Domain,
+        FullURL,
+        MainURL,
+    }
+
     function OpenOptionsMenu() {
         browser.runtime.openOptionsPage();
     }
@@ -36,7 +42,7 @@
         });
     }
 
-    async function AddCurrentToBlacklist(isDomain: boolean) {
+    async function AddCurrentToBlacklist(type: AddBlacklistType) {
         let acSites = new BlacklistSitesAC(await browser.storage.sync.get(BlacklistSitesAC.KEYS));
         const activeTabs = await browser.tabs.query({
             currentWindow: true,
@@ -54,22 +60,31 @@
             }
             let target: BlacklistSitesACEntry;
             let url = new window.URL(tab.url);
-            if (isDomain) {
-                if (url.protocol != "http:" && url.protocol != "https:") {
-                    alert(
-                        "Only support http/https urls for automatic domain blacklist, please add your domain manually."
-                    );
-                    return;
-                }
-                target = {
-                    url: `^https?\:\/\/${url.hostname}\/`,
-                    regexSearch: true,
-                };
-            } else {
-                target = {
-                    url: `^https?\:\/\/${url.hostname}${url.pathname}`,
-                    regexSearch: true,
-                };
+            switch (type) {
+                case AddBlacklistType.Domain:
+                    if (url.protocol != "http:" && url.protocol != "https:") {
+                        alert(
+                            "Only support http/https urls for automatic domain blacklist, please add your domain manually."
+                        );
+                        return;
+                    }
+                    target = {
+                        url: `^https?\:\/\/${url.hostname}\/`,
+                        regexSearch: true,
+                    };
+                    break;
+                case AddBlacklistType.MainURL:
+                    target = {
+                        url: `${url.protocol}//${url.hostname}${url.pathname}*`,
+                        regexSearch: false,
+                    };
+                case AddBlacklistType.FullURL:
+                    target = {
+                        url: tab.url,
+                        regexSearch: false,
+                    };
+                default:
+                    throw "Unexpected enum type";
             }
             acSites.data.push(target);
         }
@@ -102,12 +117,18 @@
     <div style="display: flex; flex-direction: column; gap: 10px;">
         <button
             type="button"
-            on:click={() => AddCurrentToBlacklist(false)}
-            class="btn">Add current site to blacklist</button
+            on:click={() => AddCurrentToBlacklist(AddBlacklistType.FullURL)}
+            class="btn">Add current full url to blacklist</button
         >
         <button
             type="button"
-            on:click={() => AddCurrentToBlacklist(true)}
+            on:click={() => AddCurrentToBlacklist(AddBlacklistType.MainURL)}
+            class="btn"
+            id="addCWebDomain">Add url without queries to blacklist</button
+        >
+        <button
+            type="button"
+            on:click={() => AddCurrentToBlacklist(AddBlacklistType.Domain)}
             class="btn"
             id="addCWebDomain">Add (sub)domain to blacklist</button
         >
