@@ -9,6 +9,7 @@
 
     enum AddBlacklistType {
         Domain,
+        SubDomain,
         FullURL,
         MainURL,
     }
@@ -16,7 +17,8 @@
     function OpenOptionsMenu() {
         browser.runtime.openOptionsPage();
     }
-
+    
+    let lastAddTarget: BlacklistSitesACEntry | null = null;
     let autoCloseEnabled = true;
 
     async function UpdateButton() {
@@ -61,7 +63,7 @@
             let target: BlacklistSitesACEntry;
             let url = new window.URL(tab.url);
             switch (type) {
-                case AddBlacklistType.Domain:
+                case AddBlacklistType.SubDomain:
                     if (url.protocol != "http:" && url.protocol != "https:") {
                         alert(
                             "Only support http/https urls for automatic domain blacklist, please add your domain manually."
@@ -73,19 +75,35 @@
                         regexSearch: true,
                     };
                     break;
+                case AddBlacklistType.Domain:
+                    if (url.protocol != "http:" && url.protocol != "https:") {
+                        alert(
+                            "Only support http/https urls for automatic domain blacklist, please add your domain manually."
+                        );
+                        return;
+                    }
+                    let toAdd = url.hostname.split(".");
+                    target = {
+                        url: `^https?\:\/\/${toAdd[toAdd.length - 2]}.${toAdd[toAdd.length - 1]}\/`,
+                        regexSearch: true,
+                    };
+                    break;
                 case AddBlacklistType.MainURL:
                     target = {
                         url: `${url.protocol}//${url.hostname}${url.pathname}*`,
                         regexSearch: false,
                     };
+                    break;
                 case AddBlacklistType.FullURL:
                     target = {
                         url: tab.url,
                         regexSearch: false,
                     };
+                    break;
                 default:
-                    throw "Unexpected enum type";
+                    throw "Unexpected enum type " + type;
             }
+            lastAddTarget = target;
             acSites.data.push(target);
         }
         browser.storage.sync.set(acSites.SplitToSize());
@@ -100,6 +118,11 @@
     UpdateButton();
 </script>
 
+{#if lastAddTarget != null}
+<div class="overlay center" style="background-color: rgba(0.8, 0.8, 0.8, 0.7); font-size: 14pt; flex-direction: column;">
+    <p>Added</p><code>{lastAddTarget.url}</code><p>to blacklist.</p>
+</div>
+{/if}
 <div style="margin: 15px 10px;">
     <div
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"
@@ -114,27 +137,34 @@
             on:input={ToggleEnabled}
         /><label class="switch" for="autocloseEnabled">Toggle</label>
     </div>
-    <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: grid; gap: 10px; grid-template-columns: 50% 50%;">
         <button
             type="button"
             on:click={() => AddCurrentToBlacklist(AddBlacklistType.FullURL)}
-            class="btn">Add current full url to blacklist</button
+            class="btn">Blacklist current full url</button
         >
         <button
             type="button"
             on:click={() => AddCurrentToBlacklist(AddBlacklistType.MainURL)}
             class="btn"
-            id="addCWebDomain">Add url without queries to blacklist</button
+            id="addCWebDomain">Blacklist url without queries</button
+        >
+        <button
+            type="button"
+            on:click={() => AddCurrentToBlacklist(AddBlacklistType.SubDomain)}
+            class="btn"
+            id="addCWebDomain">Blacklist subdomain</button
         >
         <button
             type="button"
             on:click={() => AddCurrentToBlacklist(AddBlacklistType.Domain)}
             class="btn"
-            id="addCWebDomain">Add (sub)domain to blacklist</button
+            id="addCWebDomain">Blacklist base domain</button
         >
         <button
             type="button"
             class="btn"
+            style="grid-column: 1/3"
             on:click={OpenOptionsMenu}
             id="openOptions">Open options menu</button
         >
