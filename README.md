@@ -7,7 +7,7 @@ Get it here: https://addons.mozilla.org/en-US/firefox/addon/blacklist-autoclose/
 
 ### Prerequisites:
 
-- `pnpm` (though just `npm` probably will work too)
+- [`pnpm`](https://pnpm.io/installation) (though just `npm` probably will work too)
 
 ### Steps:
 
