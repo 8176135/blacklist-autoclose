@@ -1,6 +1,7 @@
 <script lang="ts">
     import browser from "webextension-polyfill";
     import "~/app.css";
+    import { MatchSearch } from "~/lib/logic";
     import {
         ACEnabledKey,
         BlacklistSitesAC,
@@ -17,9 +18,48 @@
     function OpenOptionsMenu() {
         browser.runtime.openOptionsPage();
     }
-    
+
+    let removeList: BlacklistSitesACEntry[] | null = null;
     let lastAddTarget: BlacklistSitesACEntry | null = null;
     let autoCloseEnabled = true;
+
+    async function RemoveAffectedRules() {
+        let acSites = new BlacklistSitesAC(
+            await browser.storage.sync.get(BlacklistSitesAC.KEYS)
+        );
+        const activeTabs = await browser.tabs.query({
+            currentWindow: true,
+            active: true,
+        });
+        removeList = [];
+        for (const tab of activeTabs) {
+            for (const rule of acSites.data) {
+                if (!tab.url) {
+                    continue;
+                }
+                const target = { url: tab.url, rule };
+                if (MatchSearch(target)) {
+                    removeList.push(rule);
+                }
+            }
+        }
+    }
+
+    async function ConfirmRemoveRules() {
+        if (removeList == null) {
+            return;
+        }
+
+        let acSites = new BlacklistSitesAC(
+            await browser.storage.sync.get(BlacklistSitesAC.KEYS)
+        );
+        acSites.data = acSites.data.filter(
+            (c) =>
+                !removeList?.some((d) => JSON.stringify(d) == JSON.stringify(c))
+        );
+        browser.storage.sync.set(acSites.SplitToSize());
+        ClearOverlay();
+    }
 
     async function UpdateButton() {
         autoCloseEnabled =
@@ -44,8 +84,15 @@
         });
     }
 
+    function ClearOverlay() {
+        removeList = null;
+        lastAddTarget = null;
+    }
+
     async function AddCurrentToBlacklist(type: AddBlacklistType) {
-        let acSites = new BlacklistSitesAC(await browser.storage.sync.get(BlacklistSitesAC.KEYS));
+        let acSites = new BlacklistSitesAC(
+            await browser.storage.sync.get(BlacklistSitesAC.KEYS)
+        );
         const activeTabs = await browser.tabs.query({
             currentWindow: true,
             active: true,
@@ -54,7 +101,10 @@
             if (!tab.url) {
                 continue;
             }
-            if (tab.url.startsWith("about:") || tab.url.includes("815c07b3-087f-492c-9ebc-f0ea9539933a")) {
+            if (
+                tab.url.startsWith("about:") ||
+                tab.url.includes("815c07b3-087f-492c-9ebc-f0ea9539933a")
+            ) {
                 alert(
                     'Sorry, can\'t let you add an "about:" page (since you might not be able to go back in and remove it if you did.)'
                 );
@@ -84,7 +134,9 @@
                     }
                     let toAdd = url.hostname.split(".");
                     target = {
-                        url: `^https?\:\/\/${toAdd[toAdd.length - 2]}.${toAdd[toAdd.length - 1]}\/`,
+                        url: `^https?\:\/\/${toAdd[toAdd.length - 2]}.${
+                            toAdd[toAdd.length - 1]
+                        }\/`,
                         regexSearch: true,
                     };
                     break;
@@ -119,9 +171,37 @@
 </script>
 
 {#if lastAddTarget != null}
-<div class="overlay center" style="background-color: rgba(0.8, 0.8, 0.8, 0.7); font-size: 14pt; flex-direction: column;">
-    <p>Added</p><code>{lastAddTarget.url}</code><p>to blacklist.</p>
-</div>
+    <div
+        class="overlay center"
+        style="background-color: rgba(0.8, 0.8, 0.8, 0.7); flex-direction: column;"
+        on:click={ClearOverlay}
+        on:keypress={ClearOverlay}
+    >
+        <p>Added</p>
+        <code>{lastAddTarget.url}</code>
+        <p>to blacklist. Click to dismiss.</p>
+    </div>
+{/if}
+
+{#if removeList != null}
+    <div
+        class="overlay center"
+        style="background-color: rgba(0.8, 0.8, 0.8, 0.7); flex-direction: column; max-height: 100vh; padding: 3px; gap: 3px;"
+        on:click={ClearOverlay}
+        on:keypress={ClearOverlay}
+    >
+        <span>Confirm removing these rules:</span>
+        <div
+            style="overflow-y: scroll; flex: 1 1 auto; display: flex; flex-direction: column; gap: 3px;"
+        >
+            {#each removeList as listElem}
+                <code>{listElem.url}</code>
+            {/each}
+        </div>
+        <button class="btn" on:click|stopPropagation={ConfirmRemoveRules}
+            >Confirm Remove</button
+        >
+    </div>
 {/if}
 <div style="margin: 15px 10px;">
     <div
@@ -160,6 +240,13 @@
             on:click={() => AddCurrentToBlacklist(AddBlacklistType.Domain)}
             class="btn"
             id="addCWebDomain">Blacklist base domain</button
+        >
+        <button
+            type="button"
+            class="btn"
+            style="grid-column: 1/3"
+            on:click={RemoveAffectedRules}
+            id="openOptions">Remove rules affecting current tab</button
         >
         <button
             type="button"
