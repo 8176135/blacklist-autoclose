@@ -1,6 +1,6 @@
 import { defineConfig } from "vite"
 import { svelte } from "@sveltejs/vite-plugin-svelte"
-import { r } from "./scripts/utils"
+import { isDev, r } from "./scripts/utils"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,8 +13,8 @@ export default defineConfig({
   plugins: [svelte()],
   build: {
     outDir: r("dist"),
-    sourcemap: true,
-    emptyOutDir: false,
+    sourcemap: isDev ? true : false,
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         background: r("src/background/index.html"),

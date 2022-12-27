@@ -186,7 +186,7 @@
 {#if removeList != null}
     <div
         class="overlay center"
-        style="background-color: rgba(0.8, 0.8, 0.8, 0.7); flex-direction: column; max-height: 100vh; padding: 3px; gap: 3px;"
+        style="flex-direction: column; max-height: 100vh; padding: 3px; gap: 3px;"
         on:click={ClearOverlay}
         on:keypress={ClearOverlay}
     >
