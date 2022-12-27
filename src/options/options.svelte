@@ -2,6 +2,7 @@
     import browser from "webextension-polyfill";
     import "~/app.css";
     import { MatchSearch } from "~/lib/logic";
+    import { GetLatestVersion } from "~/lib/migration";
     import {
         BlacklistSitesAC,
         CloseDelayEnabledKey,
@@ -15,10 +16,12 @@
     // Delay time in milliseconds
     let closeDelayMilli = false;
     let closeHistory: string = "";
-    let acSites: BlacklistSitesAC = new BlacklistSitesAC;
+    let acSites: BlacklistSitesAC = new BlacklistSitesAC();
     let searchType = SearchType.Standard;
     let newSiteVal = "";
     let selectedIndex = -1;
+
+    let inputFiles: FileList;
 
     let removeConfirm = false;
 
@@ -97,6 +100,43 @@
         });
     }
 
+    async function Export() {
+        let exportData = {
+            version: GetLatestVersion(),
+            acSites: acSites,
+        };
+        let url = URL.createObjectURL(
+            new Blob([JSON.stringify(exportData)], {
+                type: "application/json",
+            })
+        );
+        await browser.downloads.download({
+            url,
+            filename: "exported-blacklist.json",
+            saveAs: true,
+        });
+    }
+
+    async function Import() {
+        if (!inputFiles || !inputFiles[0]) {
+            return;
+        }
+        let inputFile = inputFiles[0];
+        try {
+            let newSites = JSON.parse(await inputFile.text());
+            if (
+                confirm(
+                    `Replace existing ${acSites.data.length} entires with ${newSites.data.length} entries?`
+                )
+            ) {
+                acSites.data = newSites.data;
+                browser.storage.sync.set(acSites.SplitToSize());
+            }
+        } catch (err) {
+            alert("Failed to import file: " + err);
+        }
+    }
+
     async function ClearHistory() {
         let closeHistoryObj = new CloseHistory(
             await browser.storage.local.get(CloseHistory.KEY)
@@ -157,7 +197,8 @@
                 type="button"
                 on:click={RemoveSelected}
                 class="fill btn"
-                disabled={selectedIndex < 0 || selectedIndex >= acSites.data.length}
+                disabled={selectedIndex < 0 ||
+                    selectedIndex >= acSites.data.length}
             >
                 {#if removeConfirm}
                     Click again to confirm removal
@@ -166,37 +207,50 @@
                 {/if}
             </button>
         </div>
-
-        <!-- <div style="margin: 5px 0; flex: 0 0 auto; display: flex; justify-content: space-between; "> -->
-        <input
-            type="text"
-            name="siteToAdd"
-            bind:value={newSiteVal}
-            style="grid-column: 1/2; grid-row: 3/4;"
-        />
-        <select
-            class="searchTypeSel"
-            name=""
-            size="1"
-            style="grid-column: 2/3; grid-row: 3/4;"
-            bind:value={searchType}
-        >
-            <option value={SearchType.Standard}
-                >Standard (exact match with * as wildcard)</option
+        <form on:submit|preventDefault={AddNewToBlacklist} style="display:contents">
+            <!-- <div style="margin: 5px 0; flex: 0 0 auto; display: flex; justify-content: space-between; "> -->
+            <input
+                type="text"
+                name="siteToAdd"
+                bind:value={newSiteVal}
+                style="grid-column: 1/2; grid-row: 3/4;"
+            />
+            <select
+                class="searchTypeSel"
+                name=""
+                size="1"
+                style="grid-column: 2/3; grid-row: 3/4;"
+                bind:value={searchType}
             >
-            <option value={SearchType.Regex}>Regex</option>
-        </select>
-        <button
-            type="button"
-            class="btn"
-            on:click={AddNewToBlacklist}
-            style="grid-column: 3 / 4; grid-row: 3 / 4;"
-        >
-            Submit
-        </button>
+                <option value={SearchType.Standard}
+                    >Standard (exact match with * as wildcard)</option
+                >
+                <option value={SearchType.Regex}>Regex</option>
+            </select>
+            <button
+                type="submit"
+                class="btn"
+                style="grid-column: 3 / 4; grid-row: 3 / 4;"
+            >
+                Submit
+            </button>
+        </form>
         <!-- </div> -->
     </div>
-
+    <div
+        class="export-wrapper"
+        style="display: flex; margin: 20px 0; gap: 20px; align-items: center;"
+    >
+        <button class="btn" on:click={Export}>Export</button>
+        <div style="flex: 0 1 150px;" />
+        <input
+            id="import-picker"
+            name="Import"
+            type="file"
+            accept="application/json,.json"
+            bind:files={inputFiles}
+        /><button class="btn" on:click={Import}>Import</button>
+    </div>
     <h3>Tips</h3>
     <div class="faq" id="faq" style="font-size: 10pt">
         <ul>
@@ -247,7 +301,12 @@
     </div>
 
     <h3>Recently closed sites (Most recent first)</h3>
-    <textarea class="history-list" readonly style="width: 100%;" value={closeHistory} />
+    <textarea
+        class="history-list"
+        readonly
+        style="width: 100%;"
+        value={closeHistory}
+    />
     <button class="btn" on:click={ClearHistory}>Clear History</button>
 </div>
 

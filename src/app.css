@@ -4,6 +4,7 @@
   font-weight: normal;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'source_sans';
   src: url('~/assets/fonts/sourcesanspro-bold-webfont.woff2') format('woff2');
@@ -11,7 +12,7 @@
   font-style: normal;
 }
 
-input.switch[type=checkbox]{
+input.switch[type=checkbox] {
   height: 0;
   width: 0;
   visibility: hidden;
@@ -41,11 +42,11 @@ label.switch:after {
   transition: 0.3s;
 }
 
-input.switch:checked + label.switch {
+input.switch:checked+label.switch {
   background: #719756;
 }
 
-input.switch:checked + label.switch:after {
+input.switch:checked+label.switch:after {
   left: calc(100% - 5px);
   transform: translateX(-100%);
 }
@@ -58,6 +59,9 @@ label.switch:active:after {
   position: relative;
   height: 35px;
   display: block;
+  
+  cursor: pointer;
+
   /*margin: 30px auto;*/
   padding: 0 15px;
   text-align: center;
@@ -67,23 +71,24 @@ label.switch:active:after {
   outline: none;
   border-radius: 2px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
-  
+
   background-color: #975656;
   color: #ecf0f1;
-  
+
   transition: background-color .15s;
 }
 
 .btn:disabled {
   background-color: #777676;
   color: #BBBBBB;
+  cursor: auto;
 }
 
 .btn:hover:not(:disabled) {
   background-color: #719756;
 }
 
-.btn > * {
+.btn>* {
   position: relative;
 }
 
@@ -94,19 +99,19 @@ label.switch:active:after {
 
 .btn:before {
   content: "";
-  
+
   position: absolute;
   top: 50%;
   left: 50%;
-  
+
   display: block;
   width: 0;
   padding-top: 0;
-    
+
   border-radius: 100%;
-  
+
   background-color: rgba(236, 240, 241, .3);
-  
+
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
@@ -124,6 +129,7 @@ label.switch:active:after {
 input[type="text"] {
   padding: 0px 10px;
 }
+
 option.entry {
   padding: 5px 10px;
   vertical-align: middle;
@@ -136,24 +142,40 @@ option.entry {
   user-select: none;
 }
 
+.overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  z-index: 10;
+}
+
+.center {
+  justify-content: center; align-items: center;
+}
+
 @media (prefers-color-scheme: light) {
+
   :root,
   input {
-      background: #202023;
-      color: #111;
+    background: #202023;
+    color: #111;
   }
 }
 
 @media (prefers-color-scheme: dark) {
+
   :root,
   input,
   select,
   textarea {
-      background: #202023;
-      color: #EEE;
+    background: #202023;
+    color: #EEE;
   }
 
   input {
-      border: #EEE solid 1px !important;
+    border: #EEE solid 1px !important;
   }
 }

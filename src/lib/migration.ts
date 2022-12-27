@@ -103,3 +103,8 @@ export async function UpdateToLatestMigration() {
         [StoreVersionKey]: latestApplied,
     });
 }
+
+export function GetLatestVersion(): string {
+    let mg = MIGRATIONS.sort((a, b) => semver.compare(b.Version, a.Version));
+    return mg[0].Version;
+}

@@ -25,7 +25,7 @@ export async function getManifest() {
     },
     options_ui: {
       page: "./options/index.html",
-      open_in_tab: false,
+      open_in_tab: true,
       browser_style: true,
       chrome_style: true,
     },
@@ -41,6 +41,7 @@ export async function getManifest() {
       "tabs",
       "storage",
       "activeTab",
+      "downloads",
       "http://*/",
       "https://*/",
     ],
