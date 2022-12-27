@@ -2,7 +2,7 @@
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "ESNext",
+    "target": "ES2019",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true,
