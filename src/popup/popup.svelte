@@ -134,7 +134,7 @@
                     }
                     let toAdd = url.hostname.split(".");
                     target = {
-                        url: `^https?\:\/\/${toAdd[toAdd.length - 2]}.${
+                        url: `^https?\:\/\/[a-zA-Z\d\.]*${toAdd[toAdd.length - 2]}.${
                             toAdd[toAdd.length - 1]
                         }\/`,
                         regexSearch: true,

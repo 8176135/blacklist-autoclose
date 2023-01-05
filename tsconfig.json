@@ -6,7 +6,8 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true,
-    "module": "ESNext",
+    "module": "ES2020",
+    "lib": ["ES2022"],
     "resolveJsonModule": true,
     /**
      * Typecheck JS in `.svelte` and `.js` files by default.

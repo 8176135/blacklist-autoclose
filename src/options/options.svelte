@@ -10,12 +10,13 @@
         CloseHistory,
         SearchType,
         type BlacklistSitesACEntry,
+        type CloseTarget,
     } from "../lib/models";
 
     let closeDelayEnabled = false;
     // Delay time in milliseconds
     let closeDelayMilli = false;
-    let closeHistory: string = "";
+    let closeHistoryList: CloseTarget[] = [];
     let acSites: BlacklistSitesAC = new BlacklistSitesAC();
     let searchType = SearchType.Standard;
     let newSiteVal = "";
@@ -38,9 +39,9 @@
     }
 
     async function UpdateHistory() {
-        closeHistory = new CloseHistory(
+        closeHistoryList = new CloseHistory(
             await browser.storage.local.get(CloseHistory.KEY)
-        ).ToString();
+        ).historyStore;
     }
 
     async function AddNewToBlacklist() {
@@ -145,6 +146,15 @@
         browser.storage.local.set({
             [CloseHistory.KEY]: closeHistoryObj,
         });
+    }
+
+    async function JumpToElem(index: number) {
+        let rule = closeHistoryList[index].rule;
+        let idx = acSites.data.findIndex(c => c.url == rule.url && c.regexSearch == rule.regexSearch);
+        if (idx == -1) {
+            alert("Rule no longer exists.");
+        }
+        selectedIndex = idx;
     }
 
     browser.storage.sync.onChanged.addListener((_) => {
@@ -267,6 +277,9 @@
                 Putting ^ at the start of a regex search, and $ at the end to do
                 an exact match.
             </li>
+            <li>
+                Double click in history list to jump to the rule.
+            </li>
         </ul>
     </div>
     <div style="margin: 5px 0; font-size: 16pt; font-weight: bolder">
@@ -301,12 +314,31 @@
     </div>
 
     <h3>Recently closed sites (Most recent first)</h3>
-    <textarea
+    <select style="width: 100%;" size="6" class="history-list">
+        {#each closeHistoryList as entry, i}
+        <option
+            style="display: flex; justify-content: space-between;"
+            value={i}
+            on:dblclick={() => JumpToElem(i)}
+        >
+            <span><b>Site:</b> {entry.url}</span>
+            <span><b>Rule:</b> {entry.rule.url}</span>
+            <span
+            ><b
+                >{entry.rule.regexSearch
+                    ? "Regex Search"
+                    : "Standard Search"}</b
+            ></span
+        >
+        </option>
+    {/each}
+    </select>
+    <!-- <textarea
         class="history-list"
         readonly
         style="width: 100%;"
-        value={closeHistory}
-    />
+        value={closeHistoryList}
+    /> -->
     <button class="btn" on:click={ClearHistory}>Clear History</button>
 </div>
 
@@ -346,14 +378,6 @@
         grid-row-gap: 10px;
         grid-column-gap: 10px;
         grid-template-rows: 40px 1fr 40px;
-    }
-
-    .lastUsedRegex {
-        background-color: lightblue;
-    }
-
-    #history-list {
-        height: 300px;
     }
 
     .fill {

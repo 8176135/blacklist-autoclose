@@ -16,7 +16,7 @@ export async function getManifest() {
     browser_specific_settings: {
       gecko: {
         id: "{74108f18-bfa1-4cd3-a0b1-6c575ee3dce0}",
-        strict_min_version: "57.0",
+        strict_min_version: "92.0", // Object.hasOwn
       }
     },
     browser_action: {
