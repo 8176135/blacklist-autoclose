@@ -2,7 +2,7 @@
 <sub>
 <img src="src/assets/icon/cross128.png" width="38" />
 </sub>
-Blacklist Autoclose <br>
+Blacklist AutoClose <br>
 Install it as a <a href="https://addons.mozilla.org/en-US/firefox/addon/blacklist-autoclose/">Firefox Addon</a>
 </h1>
 
