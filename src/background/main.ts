@@ -31,7 +31,7 @@ browser.storage.sync.get(ACEnabledKey).then((item) => {
 browser.webNavigation.onBeforeNavigate.addListener(CheckURL);
 browser.webNavigation.onHistoryStateUpdated.addListener(CheckURL);
 
-async function CheckURL (details) {
+async function CheckURL(details: browser.WebNavigation.OnHistoryStateUpdatedDetailsType) {
   const isEnabled = await browser.storage.sync.get(ACEnabledKey);
   if (!isEnabled.autoCloseEnabled) {
     return;
