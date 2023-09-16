@@ -28,7 +28,10 @@ browser.storage.sync.get(ACEnabledKey).then((item) => {
   }
 });
 
-browser.webNavigation.onBeforeNavigate.addListener(async details => {
+browser.webNavigation.onBeforeNavigate.addListener(CheckURL);
+browser.webNavigation.onHistoryStateUpdated.addListener(CheckURL);
+
+async function CheckURL(details: browser.WebNavigation.OnHistoryStateUpdatedDetailsType) {
   const isEnabled = await browser.storage.sync.get(ACEnabledKey);
   if (!isEnabled.autoCloseEnabled) {
     return;
@@ -46,7 +49,7 @@ browser.webNavigation.onBeforeNavigate.addListener(async details => {
       CloseTab(details.tabId, target);
     }
   }
-});
+}
 
 // Finds and closes tabs passed in via regex
 async function CloseTab(tabId: number, target: CloseTarget) {
