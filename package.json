@@ -3,7 +3,7 @@
   "displayName": "Blacklist Autoclose",
   "description": "Automatically close all blacklisted webpages specified by the user. Useful for dealing with popups that redirects you to another page.",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
